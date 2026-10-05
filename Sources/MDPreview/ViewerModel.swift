@@ -18,6 +18,11 @@ final class ViewerModel: NSObject, ObservableObject {
     @Published private(set) var outline: [OutlineItem] = []
     @Published private(set) var currentHeading: Int?
 
+    /// Find bar state: matches for the search field's text, and which one is selected.
+    @Published private(set) var isSearching = false
+    @Published private(set) var matchCount = 0
+    @Published private(set) var currentMatch: Int?
+
     private var fileURL: URL?
     private var markdown: String
     private var watcher: FileWatcher?
@@ -110,6 +115,10 @@ final class ViewerModel: NSObject, ObservableObject {
             }
         case "current":
             currentHeading = message["index"] as? Int
+        case "search":
+            matchCount = message["count"] as? Int ?? 0
+        case "match":
+            currentMatch = message["index"] as? Int
         default:
             break
         }
@@ -153,28 +162,33 @@ final class ViewerModel: NSObject, ObservableObject {
         field.currentEditor()?.selectAll(nil)
     }
 
-    /// Search as you type: always start from the top of the document.
+    /// Search as you type: highlights every match and jumps to the first.
     func search(_ text: String) {
-        webView.evaluateJavaScript("window.getSelection().removeAllRanges()") { [weak self] _, _ in
-            MainActor.assumeIsolated {
-                guard !text.isEmpty else { return }
-                self?.find(backwards: false, beepIfMissing: false)
-            }
+        isSearching = !text.isEmpty
+        if !isSearching {
+            matchCount = 0
+            currentMatch = nil
         }
+        webView.evaluateJavaScript("search(\(Self.jsonLiteral(text)), false)")
     }
 
-    func find(backwards: Bool, beepIfMissing: Bool = true) {
-        guard let text = searchField?.stringValue, !text.isEmpty else {
+    func find(backwards: Bool) {
+        guard isSearching else {
             focusSearch()
             return
         }
-        let configuration = WKFindConfiguration()
-        configuration.backwards = backwards
-        configuration.caseSensitive = false
-        configuration.wraps = true
-        webView.find(text, configuration: configuration) { result in
-            if !result.matchFound && beepIfMissing { NSSound.beep() }
+        guard matchCount > 0 else {
+            NSSound.beep()
+            return
         }
+        webView.evaluateJavaScript("stepMatch(\(backwards ? -1 : 1))")
+    }
+
+    /// The find bar's Done button: clear the search and hand focus back to the page.
+    func endSearch() {
+        searchField?.stringValue = ""
+        search("")
+        webView.window?.makeFirstResponder(webView)
     }
 
     // MARK: Print

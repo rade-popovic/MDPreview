@@ -73,6 +73,103 @@
     if (keepScroll) window.scrollTo(0, scrollY);
     current = null;
     updateCurrent();
+    if (query) search(query, true);
+  };
+
+  // Search: highlights every match; the app's find bar steps through them.
+  const BLOCKS = "p, li, h1, h2, h3, h4, h5, h6, td, th, pre, blockquote, dt, dd, figcaption, summary";
+  let query = "";
+  let matches = [];
+  let currentMatch = -1;
+
+  // All text in the document, with a line break between blocks so matches
+  // can span inline formatting but not jump from one paragraph to the next.
+  function textIndex() {
+    const walker = document.createTreeWalker(document.getElementById("content"), NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    let text = "";
+    let lastBlock = null;
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      const block = node.parentElement.closest(BLOCKS);
+      if (nodes.length && block !== lastBlock) text += "\n";
+      lastBlock = block;
+      nodes.push({ node: node, start: text.length });
+      text += node.data;
+    }
+    return { nodes: nodes, text: text };
+  }
+
+  // Case-insensitive, keeping offsets identical to the original text.
+  function fold(text) {
+    let out = "";
+    for (let i = 0; i < text.length; i++) {
+      const lower = text[i].toLowerCase();
+      out += lower.length === 1 ? lower : text[i];
+    }
+    return out;
+  }
+
+  function nodeAt(nodes, offset) {
+    let lo = 0;
+    let hi = nodes.length - 1;
+    while (lo < hi) {
+      const mid = (lo + hi + 1) >> 1;
+      if (nodes[mid].start <= offset) lo = mid; else hi = mid - 1;
+    }
+    return nodes[lo];
+  }
+
+  window.search = function (text, keepPosition) {
+    const previous = currentMatch;
+    query = text;
+    matches = [];
+    if (text) {
+      const index = textIndex();
+      const haystack = fold(index.text);
+      const needle = fold(text);
+      for (let from = 0; matches.length < 5000; ) {
+        const start = haystack.indexOf(needle, from);
+        if (start < 0) break;
+        const end = start + needle.length;
+        const first = nodeAt(index.nodes, start);
+        const last = nodeAt(index.nodes, end - 1);
+        const range = document.createRange();
+        range.setStart(first.node, start - first.start);
+        range.setEnd(last.node, end - last.start);
+        matches.push(range);
+        from = end;
+      }
+    }
+    if (window.CSS && CSS.highlights) CSS.highlights.set("search", new Highlight(...matches));
+    post({ type: "search", count: matches.length });
+    currentMatch = -1;
+    selectMatch(keepPosition && previous >= 0 ? Math.min(previous, matches.length - 1) : 0, !keepPosition);
+  };
+
+  function selectMatch(index, scroll) {
+    if (!matches.length) {
+      if (window.CSS && CSS.highlights) CSS.highlights.delete("search-current");
+      post({ type: "match", index: null });
+      return;
+    }
+    currentMatch = (index % matches.length + matches.length) % matches.length;
+    const range = matches[currentMatch];
+    if (window.CSS && CSS.highlights) {
+      const highlight = new Highlight(range);
+      highlight.priority = 1;
+      CSS.highlights.set("search-current", highlight);
+    }
+    if (scroll) {
+      const rect = range.getBoundingClientRect();
+      if (rect.top < 60 || rect.bottom > window.innerHeight - 60) {
+        window.scrollTo(0, window.scrollY + rect.top - window.innerHeight / 3);
+      }
+    }
+    post({ type: "match", index: currentMatch });
+  }
+
+  window.stepMatch = function (delta) {
+    selectMatch(currentMatch + delta, true);
   };
 
   let updateScheduled = false;

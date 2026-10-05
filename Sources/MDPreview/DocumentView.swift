@@ -29,6 +29,11 @@ struct DocumentView: View {
     private var content: some View {
         WebViewHost(webView: viewer.webView)
             .frame(minWidth: 420, minHeight: 300)
+            .safeAreaInset(edge: .top, spacing: 0) {
+                if viewer.isSearching {
+                    FindBar(viewer: viewer)
+                }
+            }
             .toolbar {
                 ToolbarItemGroup(placement: .primaryAction) {
                     ControlGroup {
@@ -53,6 +58,48 @@ struct DocumentView: View {
             .onChange(of: fileURL) { _, newURL in
                 viewer.fileMoved(to: newURL)
             }
+    }
+}
+
+/// Preview-style bar under the toolbar while searching: match count, previous/next, Done.
+private struct FindBar: View {
+    @ObservedObject var viewer: ViewerModel
+
+    private var status: String {
+        switch (viewer.matchCount, viewer.currentMatch) {
+        case (0, _): "Not found"
+        case (1, _): "1 match"
+        case let (count, index?): "\(index + 1) of \(count) matches"
+        case let (count, nil): "\(count) matches"
+        }
+    }
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Spacer()
+            Text(status)
+                .foregroundStyle(.secondary)
+                .monospacedDigit()
+            ControlGroup {
+                Button { viewer.find(backwards: true) } label: {
+                    Label("Previous", systemImage: "chevron.left")
+                }
+                .help("Previous match (⇧⌘G)")
+                Button { viewer.find(backwards: false) } label: {
+                    Label("Next", systemImage: "chevron.right")
+                }
+                .help("Next match (⌘G)")
+            }
+            .labelStyle(.iconOnly)
+            .fixedSize()
+            .disabled(viewer.matchCount == 0)
+            Button("Done") { viewer.endSearch() }
+        }
+        .controlSize(.small)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .background(.bar)
+        .overlay(alignment: .bottom) { Divider() }
     }
 }
 
