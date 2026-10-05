@@ -1,6 +1,17 @@
 // Draws Resources/AppIcon.icns. Run: swiftc scripts/make-icon.swift -o /tmp/make-icon && /tmp/make-icon
 import AppKit
 
+// Raboš brand palette and wordmark font (Rabos/ra_frontend/src/index.css).
+let slate = NSColor(srgbRed: 0x23 / 255.0, green: 0x30 / 255.0, blue: 0x38 / 255.0, alpha: 1)
+let amber = NSColor(srgbRed: 0xcf / 255.0, green: 0x8a / 255.0, blue: 0x3c / 255.0, alpha: 1)
+let paper = NSColor(srgbRed: 0xf4 / 255.0, green: 0xef / 255.0, blue: 0xe8 / 255.0, alpha: 1)
+
+let scriptDir = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+let fontURL = scriptDir.appendingPathComponent("fonts/IBMPlexSans-SemiBold.ttf")
+guard let plexSemiBold = (CTFontManagerCreateFontDescriptorsFromURL(fontURL as CFURL) as? [CTFontDescriptor])?.first else {
+    fatalError("Missing \(fontURL.path)")
+}
+
 func render(size: CGFloat) -> NSBitmapImageRep {
     let rep = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: Int(size), pixelsHigh: Int(size),
                                bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false,
@@ -9,40 +20,34 @@ func render(size: CGFloat) -> NSBitmapImageRep {
     NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: rep)
     let s = size / 1024
 
-    // Page with a soft shadow, inset like Apple's icon grid.
-    let page = NSRect(x: 100 * s, y: 100 * s, width: 824 * s, height: 824 * s)
+    // Paper tile with a soft shadow, inset like Apple's icon grid.
+    let tile = NSRect(x: 100 * s, y: 100 * s, width: 824 * s, height: 824 * s)
     let shadow = NSShadow()
     shadow.shadowBlurRadius = 24 * s
     shadow.shadowOffset = NSSize(width: 0, height: -10 * s)
-    shadow.shadowColor = NSColor.black.withAlphaComponent(0.3)
+    shadow.shadowColor = NSColor.black.withAlphaComponent(0.25)
     NSGraphicsContext.current?.saveGraphicsState()
     shadow.set()
-    let pagePath = NSBezierPath(roundedRect: page, xRadius: 185 * s, yRadius: 185 * s)
-    NSGradient(starting: NSColor(white: 1, alpha: 1), ending: NSColor(white: 0.92, alpha: 1))!
-        .draw(in: pagePath, angle: -90)
+    paper.setFill()
+    NSBezierPath(roundedRect: tile, xRadius: 185 * s, yRadius: 185 * s).fill()
     NSGraphicsContext.current?.restoreGraphicsState()
 
-    // Blue header band.
-    NSGraphicsContext.current?.saveGraphicsState()
-    pagePath.addClip()
-    let band = NSRect(x: page.minX, y: page.maxY - 190 * s, width: page.width, height: 190 * s)
-    NSGradient(starting: NSColor(calibratedRed: 0.30, green: 0.56, blue: 0.98, alpha: 1),
-               ending: NSColor(calibratedRed: 0.16, green: 0.40, blue: 0.90, alpha: 1))!
-        .draw(in: band, angle: -90)
-    NSGraphicsContext.current?.restoreGraphicsState()
+    // Lowercase "md" in slate, centred on its visible glyph bounds, with an amber underline.
+    let font = CTFontCreateWithFontDescriptor(plexSemiBold, 430 * s, nil)
+    let text = NSAttributedString(string: "md", attributes: [.font: font, .foregroundColor: slate])
+    let line = CTLineCreateWithAttributedString(text)
+    let context = NSGraphicsContext.current!.cgContext
+    let bounds = CTLineGetImageBounds(line, context)
+    let barHeight = 44 * s, gap = 70 * s
+    let groupHeight = bounds.height + gap + barHeight
+    let glyphBottom = tile.midY - groupHeight / 2 + barHeight + gap
+    context.textPosition = CGPoint(x: tile.midX - bounds.midX, y: glyphBottom - bounds.minY)
+    CTLineDraw(line, context)
 
-    // "M↓" mark.
-    let paragraph = NSMutableParagraphStyle()
-    paragraph.alignment = .center
-    let attributes: [NSAttributedString.Key: Any] = [
-        .font: NSFont.systemFont(ofSize: 400 * s, weight: .heavy),
-        .foregroundColor: NSColor(white: 0.18, alpha: 1),
-        .paragraphStyle: paragraph,
-    ]
-    let text = NSAttributedString(string: "M↓", attributes: attributes)
-    let textSize = text.size()
-    text.draw(in: NSRect(x: page.minX, y: page.minY + (page.height - 190 * s - textSize.height) / 2,
-                         width: page.width, height: textSize.height))
+    amber.setFill()
+    let bar = NSRect(x: tile.midX - bounds.width / 2, y: glyphBottom - gap - barHeight,
+                     width: bounds.width, height: barHeight)
+    NSBezierPath(roundedRect: bar, xRadius: barHeight / 2, yRadius: barHeight / 2).fill()
 
     NSGraphicsContext.restoreGraphicsState()
     return rep
