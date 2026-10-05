@@ -15,6 +15,7 @@ mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$BIN_DIR/MDPreview" "$APP/Contents/MacOS/MDPreview"
 cp Resources/Info.plist "$APP/Contents/Info.plist"
 cp -R Resources/web "$APP/Contents/Resources/web"
+cp LICENSE THIRD_PARTY_NOTICES.md "$APP/Contents/Resources/"
 if [[ -f Resources/AppIcon.icns ]]; then
   cp Resources/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 fi
@@ -22,7 +23,7 @@ fi
 # Quick Look extension, embedded in the app. SwiftPM can't build an .appex, so swiftc it directly.
 APPEX="$APP/Contents/PlugIns/MDPreviewQuickLook.appex"
 mkdir -p "$APPEX/Contents/MacOS" "$APPEX/Contents/Resources"
-swiftc -O -target arm64-apple-macos14.0 -parse-as-library -application-extension \
+swiftc -O -target "$(uname -m)-apple-macos14.0" -parse-as-library -application-extension \
   -module-name MDPreviewQuickLook QuickLook/*.swift \
   -Xlinker -e -Xlinker _NSExtensionMain \
   -o "$APPEX/Contents/MacOS/MDPreviewQuickLook"

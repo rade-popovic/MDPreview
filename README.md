@@ -2,27 +2,50 @@
 
 A read-only Markdown viewer for macOS that behaves like Preview: double-click a `.md` file, get a window.
 
-GitHub-style rendering (tables, task lists, code highlighting), light/dark mode, relative images,
-live reload when the file changes, a heading outline sidebar, search, zoom and print. Everything works offline.
+![MD Preview showing a README with the outline sidebar](docs/screenshot.png)
 
-Includes a Quick Look extension, so pressing Space on a `.md` file in Finder shows the same rendering.
+## Features
 
-## Build
+- **GitHub-style rendering** — tables, task lists, syntax-highlighted code, front matter, light and dark mode
+- **Native document app** — one window per file, recent files, window restore, print and Save as PDF
+- **Outline sidebar** — every heading, follows you as you scroll, click to jump
+- **Find bar** — highlights every match; step through with ⌘G / ⇧⌘G
+- **Live reload** — re-renders when the file is saved, keeping your place
+- **Quick Look** — press Space on a `.md` file in Finder for the same rendering
+- Relative images, links to other `.md` files open in MD Preview, web links in your browser
+- Fully offline; scripts embedded in Markdown are never run
+
+## Install
+
+Requires macOS 14 or later and Xcode or the Xcode Command Line Tools (`xcode-select --install`).
 
 ```bash
-./build.sh            # builds build/MD Preview.app
-./build.sh install    # also copies it to /Applications
+git clone https://github.com/rade-popovic/MDPreview.git
+cd MDPreview
+./build.sh install
 ```
 
-Requires Xcode command line tools, macOS 14+.
+This builds the app and copies it to `/Applications`. Then open MD Preview and choose
+**MD Preview → Make Default Markdown Viewer** (or use Finder's Get Info → Open with → Change All).
 
-To make it the default for `.md` files, use **MD Preview → Make Default Markdown Viewer**, or Finder's
-Get Info → Open with → Change All.
+If another Quick Look extension for Markdown is installed, macOS may keep using it. Turn it off in
+System Settings → General → Login Items & Extensions → Quick Look.
 
-## Layout
+## Build only
+
+```bash
+./build.sh            # builds build/MD Preview.app without installing
+```
+
+## Project layout
 
 - `Sources/MDPreview` — SwiftUI app (`DocumentGroup(viewing:)`) hosting a `WKWebView`
-- `Resources/web` — page template, renderer glue and styles; `vendor/` holds marked, DOMPurify,
-  highlight.js and github-markdown-css
 - `QuickLook` — Quick Look preview extension; renders with `Resources/web/core.js` in JavaScriptCore
+- `Resources/web` — page template, renderer and styles; `vendor/` holds marked, DOMPurify,
+  highlight.js and github-markdown-css
 - `scripts/make-icon.swift` — regenerates `Resources/AppIcon.icns`
+
+## License
+
+[Apache License 2.0](LICENSE). Bundled third-party components keep their own licenses — see
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
