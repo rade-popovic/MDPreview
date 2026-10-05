@@ -20,7 +20,7 @@ func render(size: CGFloat) -> NSBitmapImageRep {
     NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: rep)
     let s = size / 1024
 
-    // Paper tile with a soft shadow, inset like Apple's icon grid.
+    // Amber tile with a soft shadow, inset like Apple's icon grid.
     let tile = NSRect(x: 100 * s, y: 100 * s, width: 824 * s, height: 824 * s)
     let shadow = NSShadow()
     shadow.shadowBlurRadius = 24 * s
@@ -28,11 +28,11 @@ func render(size: CGFloat) -> NSBitmapImageRep {
     shadow.shadowColor = NSColor.black.withAlphaComponent(0.25)
     NSGraphicsContext.current?.saveGraphicsState()
     shadow.set()
-    paper.setFill()
+    amber.setFill()
     NSBezierPath(roundedRect: tile, xRadius: 185 * s, yRadius: 185 * s).fill()
     NSGraphicsContext.current?.restoreGraphicsState()
 
-    // Lowercase "md" in slate, centred on its visible glyph bounds, with an amber underline.
+    // Lowercase "md" in slate, centred on its visible glyph bounds, with a paper underline.
     let font = CTFontCreateWithFontDescriptor(plexSemiBold, 430 * s, nil)
     let text = NSAttributedString(string: "md", attributes: [.font: font, .foregroundColor: slate])
     let line = CTLineCreateWithAttributedString(text)
@@ -44,7 +44,7 @@ func render(size: CGFloat) -> NSBitmapImageRep {
     context.textPosition = CGPoint(x: tile.midX - bounds.midX, y: glyphBottom - bounds.minY)
     CTLineDraw(line, context)
 
-    amber.setFill()
+    paper.setFill()
     let bar = NSRect(x: tile.midX - bounds.width / 2, y: glyphBottom - gap - barHeight,
                      width: bounds.width, height: barHeight)
     NSBezierPath(roundedRect: bar, xRadius: barHeight / 2, yRadius: barHeight / 2).fill()
