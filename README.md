@@ -1,8 +1,10 @@
+<p align="center"><img src="docs/icon.png" width="128" alt="MD Preview icon"></p>
+
 # MD Preview
 
 A read-only Markdown viewer for macOS that behaves like Preview: double-click a `.md` file, get a window.
 
-![MD Preview showing a README with the outline sidebar](docs/screenshot.png)
+![MD Preview showing its own README with the outline sidebar](docs/screenshot.png)
 
 ## Features
 
