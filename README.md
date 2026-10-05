@@ -4,7 +4,7 @@
 
 A read-only Markdown viewer for macOS that behaves like Preview: double-click a `.md` file, get a window.
 
-![MD Preview showing its own README with the outline sidebar](docs/screenshot.png)
+![MD Preview showing the Apache License with the outline sidebar](docs/screenshot.png)
 
 ## Features
 
