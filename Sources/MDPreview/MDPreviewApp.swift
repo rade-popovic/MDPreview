@@ -17,6 +17,7 @@ struct MDPreviewApp: App {
 
 struct ViewerCommands: Commands {
     @FocusedObject private var viewer: ViewerModel?
+    @AppStorage(Theme.defaultsKey) private var theme: Theme = .standard
 
     var body: some Commands {
         CommandGroup(after: .appSettings) {
@@ -55,6 +56,10 @@ struct ViewerCommands: Commands {
                 .keyboardShortcut("+")
             Button("Zoom Out") { viewer?.zoomOut() }
                 .keyboardShortcut("-")
+            Divider()
+            Picker("Theme", selection: $theme) {
+                ForEach(Theme.allCases) { Text($0.title).tag($0) }
+            }
             Divider()
         }
     }

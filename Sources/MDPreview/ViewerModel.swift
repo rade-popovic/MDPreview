@@ -69,6 +69,7 @@ final class ViewerModel: NSObject, ObservableObject {
     private func loadPage() {
         pageLoaded = false
         let html = Self.pageTemplate
+            .replacingOccurrences(of: "/*THEME*/", with: Theme.current.rawValue)
             .replacingOccurrences(of: "/*SCROLL*/0", with: String(scrollY))
             .replacingOccurrences(of: "<!--MARKDOWN-->", with: Self.jsonLiteral(markdown))
         webView.loadHTMLString(html, baseURL: LocalSchemeHandler.pageURL(forDocumentAt: fileURL))
@@ -133,6 +134,12 @@ final class ViewerModel: NSObject, ObservableObject {
         default:
             break
         }
+    }
+
+    /// Before the page has loaded, the template already carries the current theme.
+    func setTheme(_ theme: Theme) {
+        guard pageLoaded else { return }
+        webView.evaluateJavaScript("setTheme(\(Self.jsonLiteral(theme.rawValue)))")
     }
 
     func scrollToHeading(_ index: Int) {

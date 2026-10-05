@@ -172,6 +172,11 @@
     selectMatch(currentMatch + delta, true);
   };
 
+  // Theme: styles in gold.css key off this attribute; "default" is the plain GitHub look.
+  window.setTheme = function (name) {
+    document.documentElement.dataset.theme = name;
+  };
+
   // Reading position: restored on open, reported to the app as the reader scrolls.
   let userScrolled = false;
   ["wheel", "keydown", "mousedown"].forEach(function (type) {

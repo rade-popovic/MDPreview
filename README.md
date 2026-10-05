@@ -9,6 +9,7 @@ A read-only Markdown viewer for macOS that behaves like Preview: double-click a 
 ## Features
 
 - **GitHub-style rendering** — tables, task lists, syntax-highlighted code, front matter, light and dark mode
+- **Themes** — View › Theme switches between Default (GitHub) and Gold (warm paper, slate and amber, IBM Plex), each in light and dark
 - **Native document app** — one window per file, recent files, window restore, reopens where you left off, print and Export as PDF
 - **Outline sidebar** — every heading, follows you as you scroll, click to jump
 - **Find bar** — highlights every match; step through with ⌘G / ⇧⌘G
@@ -44,7 +45,7 @@ System Settings → General → Login Items & Extensions → Quick Look.
 - `Sources/MDPreview` — SwiftUI app (`DocumentGroup(viewing:)`) hosting a `WKWebView`
 - `QuickLook` — Quick Look preview extension; renders with `Resources/web/core.js` in JavaScriptCore
 - `Resources/web` — page template, renderer and styles; `vendor/` holds marked, DOMPurify,
-  highlight.js and github-markdown-css
+  highlight.js and github-markdown-css; `fonts/` holds IBM Plex for the Gold theme
 - `scripts/make-icon.swift` — regenerates `Resources/AppIcon.icns`
 
 ## License

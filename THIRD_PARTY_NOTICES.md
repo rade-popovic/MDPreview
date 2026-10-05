@@ -8,7 +8,8 @@ MD Preview bundles the following third-party software. Each is used under its ow
 | [DOMPurify](https://github.com/cure53/DOMPurify) | 3.4.16 | Apache 2.0 (dual-licensed with MPL 2.0; used under Apache 2.0) | `Resources/web/vendor/purify.min.js` |
 | [highlight.js](https://github.com/highlightjs/highlight.js) | 11.11.1 | BSD 3-Clause | `Resources/web/vendor/highlight.min.js`, `hljs-github*.css` |
 | [github-markdown-css](https://github.com/sindresorhus/github-markdown-css) | 5.9.0 | MIT | `Resources/web/vendor/github-markdown-*.css` |
-| [IBM Plex Sans](https://github.com/IBM/plex) | — | SIL Open Font License 1.1 | `scripts/fonts/` (used to draw the app icon; license in `scripts/fonts/OFL.txt`) |
+| [IBM Plex Sans](https://github.com/IBM/plex) | 1.1.0 (`@ibm/plex-sans`) | SIL Open Font License 1.1 | `Resources/web/fonts/` (Gold theme); `scripts/fonts/` (app icon) |
+| [IBM Plex Mono](https://github.com/IBM/plex) | 2.5.0 (`@ibm/plex-mono`) | SIL Open Font License 1.1 | `Resources/web/fonts/` (Gold theme) |
 
 ---
 
@@ -108,6 +109,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 ---
 
-## IBM Plex Sans
+## IBM Plex Sans and IBM Plex Mono
 
-See [scripts/fonts/OFL.txt](scripts/fonts/OFL.txt).
+See [Resources/web/fonts/OFL.txt](Resources/web/fonts/OFL.txt) (shipped inside the app; same text as `scripts/fonts/OFL.txt`).

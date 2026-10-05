@@ -5,6 +5,7 @@ struct DocumentView: View {
 
     let fileURL: URL?
     @StateObject private var viewer: ViewerModel
+    @AppStorage(Theme.defaultsKey) private var theme: Theme = .standard
     /// Each window toggles on its own; new windows open the way the last one was left.
     @State private var columnVisibility: NavigationSplitViewVisibility =
         (UserDefaults.standard.object(forKey: DocumentView.showOutlineKey) as? Bool ?? true) ? .all : .detailOnly
@@ -57,6 +58,9 @@ struct DocumentView: View {
             .focusedSceneObject(viewer)
             .onChange(of: fileURL) { _, newURL in
                 viewer.fileMoved(to: newURL)
+            }
+            .onChange(of: theme) { _, newTheme in
+                viewer.setTheme(newTheme)
             }
     }
 }

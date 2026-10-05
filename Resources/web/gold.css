@@ -1,0 +1,264 @@
+/* Gold theme: Raboš colours (Slate + Amber on warm Paper) and IBM Plex type.
+   Applies when the app sets <html data-theme="gold">; layered over the GitHub styles. */
+
+@font-face { font-family: "IBM Plex Sans"; src: url("fonts/IBMPlexSans-Regular.woff2") format("woff2"); font-weight: 400; font-style: normal; }
+@font-face { font-family: "IBM Plex Sans"; src: url("fonts/IBMPlexSans-Italic.woff2") format("woff2"); font-weight: 400; font-style: italic; }
+@font-face { font-family: "IBM Plex Sans"; src: url("fonts/IBMPlexSans-SemiBold.woff2") format("woff2"); font-weight: 600 700; font-style: normal; }
+@font-face { font-family: "IBM Plex Sans"; src: url("fonts/IBMPlexSans-SemiBoldItalic.woff2") format("woff2"); font-weight: 600 700; font-style: italic; }
+@font-face { font-family: "IBM Plex Mono"; src: url("fonts/IBMPlexMono-Regular.woff2") format("woff2"); font-weight: 400; font-style: normal; }
+
+html[data-theme="gold"] {
+  --gold-bg: #f4efe8;          /* Paper */
+  --gold-surface: #ffffff;     /* code blocks, like Raboš cards */
+  --gold-fg: #233038;          /* Slate */
+  --gold-muted: #6e665b;
+  --gold-line: #e3dccf;        /* Mist */
+  --gold-soft: #ece6dc;        /* inline code, table header */
+  --gold-faint: #efe8dd;       /* zebra rows */
+  --gold-accent: #cf8a3c;      /* Amber: rules and bars, never body text */
+  --gold-accent-text: #95571a; /* amber dark enough to read on Paper */
+  --gold-mark: #f6e7d2;
+  --gold-success: #4f7a52;
+  --gold-danger: #b14a3c;
+
+  --gold-code-keyword: #9c4a26;
+  --gold-code-string: #4f7a52;
+  --gold-code-number: #8a5a12;
+  --gold-code-title: #2f5266;
+  --gold-code-type: #7a5230;
+  --gold-code-comment: #8a8175;
+  --gold-code-variable: #b14a3c;
+  --gold-code-added-bg: #e1ead9;
+  --gold-code-deleted-bg: #f5ddd7;
+}
+
+/* Dark Gold: Slate becomes the page, Paper the text, Amber stays the accent.
+   Screen only, so print and PDF export always use the light version. */
+@media screen and (prefers-color-scheme: dark) {
+  html[data-theme="gold"] {
+    --gold-bg: #1b2328;
+    --gold-surface: #233038;
+    --gold-fg: #ece6dc;
+    --gold-muted: #b9b0a3;
+    --gold-line: #36444d;
+    --gold-soft: #2c3a42;
+    --gold-faint: #20292f;
+    --gold-accent: #cf8a3c;
+    --gold-accent-text: #e3a961;
+    --gold-mark: #cf8a3c47;
+    --gold-success: #8fb98f;
+    --gold-danger: #e58a7d;
+
+    --gold-code-keyword: #e8956b;
+    --gold-code-string: #a6c99c;
+    --gold-code-number: #e3b26b;
+    --gold-code-title: #9cc0d4;
+    --gold-code-type: #d6b38a;
+    --gold-code-comment: #8d948f;
+    --gold-code-variable: #e58a7d;
+    --gold-code-added-bg: #2b3f2d;
+    --gold-code-deleted-bg: #4a2a26;
+  }
+}
+
+html[data-theme="gold"],
+html[data-theme="gold"] body {
+  background: var(--gold-bg);
+}
+
+html[data-theme="gold"] .markdown-body {
+  color: var(--gold-fg);
+  background-color: transparent;
+  font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif, "Apple Color Emoji";
+  font-feature-settings: "locl" 1;
+}
+
+html[data-theme="gold"] .markdown-body code,
+html[data-theme="gold"] .markdown-body kbd,
+html[data-theme="gold"] .markdown-body pre,
+html[data-theme="gold"] .markdown-body samp,
+html[data-theme="gold"] .markdown-body tt {
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* Links are Slate (Raboš has no blue), underlined in Amber. */
+html[data-theme="gold"] .markdown-body a {
+  color: var(--gold-fg);
+  text-decoration: underline;
+  text-decoration-color: var(--gold-accent);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: .2em;
+}
+
+html[data-theme="gold"] .markdown-body a:hover {
+  color: var(--gold-accent-text);
+}
+
+html[data-theme="gold"] .markdown-body h1 {
+  border-bottom: 2px solid var(--gold-accent);
+}
+
+html[data-theme="gold"] .markdown-body h2,
+html[data-theme="gold"] .markdown-body hr {
+  border-bottom-color: var(--gold-line);
+}
+
+html[data-theme="gold"] .markdown-body hr {
+  background-color: var(--gold-line);
+}
+
+html[data-theme="gold"] .markdown-body h6,
+html[data-theme="gold"] .markdown-body .footnotes {
+  color: var(--gold-muted);
+}
+
+html[data-theme="gold"] .markdown-body blockquote {
+  color: var(--gold-muted);
+  border-left-color: var(--gold-accent);
+}
+
+html[data-theme="gold"] .markdown-body li::marker {
+  color: var(--gold-accent-text);
+}
+
+html[data-theme="gold"] .markdown-body mark {
+  color: var(--gold-fg);
+  background-color: var(--gold-mark);
+}
+
+html[data-theme="gold"] .markdown-body code,
+html[data-theme="gold"] .markdown-body tt {
+  background-color: var(--gold-soft);
+}
+
+html[data-theme="gold"] .markdown-body pre {
+  color: var(--gold-fg);
+  background-color: var(--gold-surface);
+  border: 1px solid var(--gold-line);
+  border-radius: 8px;
+}
+
+html[data-theme="gold"] .markdown-body pre code {
+  background-color: transparent;
+}
+
+html[data-theme="gold"] .markdown-body kbd {
+  color: var(--gold-fg);
+  background-color: var(--gold-surface);
+  border-color: var(--gold-line);
+  box-shadow: inset 0 -1px 0 var(--gold-line);
+}
+
+html[data-theme="gold"] .markdown-body table th,
+html[data-theme="gold"] .markdown-body table td,
+html[data-theme="gold"] .markdown-body .footnotes {
+  border-color: var(--gold-line);
+}
+
+html[data-theme="gold"] .markdown-body table tr {
+  background-color: transparent;
+  border-top-color: var(--gold-line);
+}
+
+html[data-theme="gold"] .markdown-body table tr:nth-child(2n) {
+  background-color: var(--gold-faint);
+}
+
+html[data-theme="gold"] .markdown-body table th {
+  background-color: var(--gold-soft);
+}
+
+html[data-theme="gold"] .markdown-body input[type="checkbox"] {
+  accent-color: var(--gold-accent);
+}
+
+/* GitHub alerts (> [!NOTE] and friends) in brand colours. */
+html[data-theme="gold"] .markdown-body .markdown-alert { border-left-color: var(--gold-line); }
+html[data-theme="gold"] .markdown-body .markdown-alert.markdown-alert-note { border-left-color: var(--gold-fg); }
+html[data-theme="gold"] .markdown-body .markdown-alert.markdown-alert-note .markdown-alert-title { color: var(--gold-fg); }
+html[data-theme="gold"] .markdown-body .markdown-alert.markdown-alert-tip { border-left-color: var(--gold-success); }
+html[data-theme="gold"] .markdown-body .markdown-alert.markdown-alert-tip .markdown-alert-title { color: var(--gold-success); }
+html[data-theme="gold"] .markdown-body .markdown-alert.markdown-alert-important,
+html[data-theme="gold"] .markdown-body .markdown-alert.markdown-alert-warning { border-left-color: var(--gold-accent); }
+html[data-theme="gold"] .markdown-body .markdown-alert.markdown-alert-important .markdown-alert-title,
+html[data-theme="gold"] .markdown-body .markdown-alert.markdown-alert-warning .markdown-alert-title { color: var(--gold-accent-text); }
+html[data-theme="gold"] .markdown-body .markdown-alert.markdown-alert-caution { border-left-color: var(--gold-danger); }
+html[data-theme="gold"] .markdown-body .markdown-alert.markdown-alert-caution .markdown-alert-title { color: var(--gold-danger); }
+
+/* Syntax highlighting: warm counterparts of the GitHub highlight.js colours. */
+html[data-theme="gold"] .hljs,
+html[data-theme="gold"] .hljs-subst,
+html[data-theme="gold"] .hljs-emphasis,
+html[data-theme="gold"] .hljs-strong {
+  color: var(--gold-fg);
+}
+
+html[data-theme="gold"] .hljs-doctag,
+html[data-theme="gold"] .hljs-keyword,
+html[data-theme="gold"] .hljs-meta .hljs-keyword,
+html[data-theme="gold"] .hljs-template-tag,
+html[data-theme="gold"] .hljs-selector-tag {
+  color: var(--gold-code-keyword);
+}
+
+html[data-theme="gold"] .hljs-string,
+html[data-theme="gold"] .hljs-regexp,
+html[data-theme="gold"] .hljs-meta .hljs-string,
+html[data-theme="gold"] .hljs-name,
+html[data-theme="gold"] .hljs-quote,
+html[data-theme="gold"] .hljs-selector-pseudo {
+  color: var(--gold-code-string);
+}
+
+html[data-theme="gold"] .hljs-number,
+html[data-theme="gold"] .hljs-literal,
+html[data-theme="gold"] .hljs-attr,
+html[data-theme="gold"] .hljs-attribute,
+html[data-theme="gold"] .hljs-operator,
+html[data-theme="gold"] .hljs-selector-attr,
+html[data-theme="gold"] .hljs-selector-class,
+html[data-theme="gold"] .hljs-selector-id,
+html[data-theme="gold"] .hljs-bullet,
+html[data-theme="gold"] .hljs-section {
+  color: var(--gold-code-number);
+}
+
+html[data-theme="gold"] .hljs-title,
+html[data-theme="gold"] .hljs-title.class_,
+html[data-theme="gold"] .hljs-title.class_.inherited__,
+html[data-theme="gold"] .hljs-title.function_ {
+  color: var(--gold-code-title);
+}
+
+html[data-theme="gold"] .hljs-type,
+html[data-theme="gold"] .hljs-built_in,
+html[data-theme="gold"] .hljs-symbol {
+  color: var(--gold-code-type);
+}
+
+html[data-theme="gold"] .hljs-variable,
+html[data-theme="gold"] .hljs-template-variable,
+html[data-theme="gold"] .hljs-variable.language_ {
+  color: var(--gold-code-variable);
+}
+
+html[data-theme="gold"] .hljs-meta {
+  color: var(--gold-muted);
+}
+
+html[data-theme="gold"] .hljs-comment,
+html[data-theme="gold"] .hljs-code,
+html[data-theme="gold"] .hljs-formula {
+  color: var(--gold-code-comment);
+  font-style: italic;
+}
+
+html[data-theme="gold"] .hljs-addition {
+  color: var(--gold-success);
+  background-color: var(--gold-code-added-bg);
+}
+
+html[data-theme="gold"] .hljs-deletion {
+  color: var(--gold-danger);
+  background-color: var(--gold-code-deleted-bg);
+}
