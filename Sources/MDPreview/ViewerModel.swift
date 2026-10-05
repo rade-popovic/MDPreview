@@ -28,6 +28,7 @@ final class ViewerModel: NSObject, ObservableObject {
     private var watcher: FileWatcher?
     private var pageLoaded = false
     private var reloadScheduled = false
+    private var scrollY: Double = 0
 
     private static let zoomSteps: [CGFloat] = [0.5, 0.67, 0.75, 0.85, 1, 1.15, 1.25, 1.5, 1.75, 2, 2.5, 3]
 
@@ -54,6 +55,11 @@ final class ViewerModel: NSObject, ObservableObject {
         webView.onZoomIn = { [weak self] in self?.zoomIn() }
         webView.configuration.userContentController.add(ScriptMessageProxy(self), name: "viewer")
 
+        if let fileURL, let saved = ReadingPositions.position(for: fileURL) {
+            scrollY = saved.scrollY
+            webView.pageZoom = saved.zoom
+        }
+
         loadPage()
         startWatching()
     }
@@ -62,7 +68,9 @@ final class ViewerModel: NSObject, ObservableObject {
 
     private func loadPage() {
         pageLoaded = false
-        let html = Self.pageTemplate.replacingOccurrences(of: "<!--MARKDOWN-->", with: Self.jsonLiteral(markdown))
+        let html = Self.pageTemplate
+            .replacingOccurrences(of: "/*SCROLL*/0", with: String(scrollY))
+            .replacingOccurrences(of: "<!--MARKDOWN-->", with: Self.jsonLiteral(markdown))
         webView.loadHTMLString(html, baseURL: LocalSchemeHandler.pageURL(forDocumentAt: fileURL))
     }
 
@@ -115,6 +123,9 @@ final class ViewerModel: NSObject, ObservableObject {
             }
         case "current":
             currentHeading = message["index"] as? Int
+        case "scroll":
+            scrollY = message["y"] as? Double ?? 0
+            savePosition()
         case "search":
             matchCount = message["count"] as? Int ?? 0
         case "match":
@@ -152,6 +163,12 @@ final class ViewerModel: NSObject, ObservableObject {
 
     private func setZoom(_ zoom: CGFloat) {
         webView.pageZoom = zoom
+        savePosition()
+    }
+
+    private func savePosition() {
+        guard let fileURL else { return }
+        ReadingPositions.save(.init(scrollY: scrollY, zoom: webView.pageZoom), for: fileURL)
     }
 
     // MARK: Find

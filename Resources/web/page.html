@@ -17,6 +17,9 @@
 <body>
 <article id="content" class="markdown-body"></article>
 <script id="markdown-source" type="application/json"><!--MARKDOWN--></script>
-<script>render(JSON.parse(document.getElementById("markdown-source").textContent), false);</script>
+<script>
+render(JSON.parse(document.getElementById("markdown-source").textContent), false);
+restoreScroll(/*SCROLL*/0);
+</script>
 </body>
 </html>

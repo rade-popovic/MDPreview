@@ -172,6 +172,29 @@
     selectMatch(currentMatch + delta, true);
   };
 
+  // Reading position: restored on open, reported to the app as the reader scrolls.
+  let userScrolled = false;
+  ["wheel", "keydown", "mousedown"].forEach(function (type) {
+    window.addEventListener(type, function () { userScrolled = true; }, { passive: true });
+  });
+
+  window.restoreScroll = function (y) {
+    if (!y) return;
+    window.scrollTo(0, y);
+    // Images that load later can shift the layout; settle again unless the reader already moved.
+    window.addEventListener("load", function () {
+      if (!userScrolled) window.scrollTo(0, y);
+    });
+  };
+
+  let positionTimer = null;
+  window.addEventListener("scroll", function () {
+    clearTimeout(positionTimer);
+    positionTimer = setTimeout(function () {
+      post({ type: "scroll", y: Math.round(window.scrollY) });
+    }, 250);
+  }, { passive: true });
+
   let updateScheduled = false;
   function scheduleUpdate() {
     if (updateScheduled) return;
