@@ -208,10 +208,39 @@ final class ViewerModel: NSObject, ObservableObject {
         webView.window?.makeFirstResponder(webView)
     }
 
-    // MARK: Print
+    // MARK: Print and export
 
     func printDocument() {
         guard let window = webView.window else { return }
+        printOperation(with: Self.pageSetup())
+            .runModal(for: window, delegate: nil, didRun: nil, contextInfo: nil)
+    }
+
+    /// Same pages as Print, written straight to a PDF file.
+    func exportPDF() {
+        guard let window = webView.window else { return }
+        let panel = NSSavePanel()
+        panel.allowedContentTypes = [.pdf]
+        panel.nameFieldStringValue = documentTitle + ".pdf"
+        panel.directoryURL = fileURL?.deletingLastPathComponent()
+        panel.beginSheetModal(for: window) { [weak self] response in
+            MainActor.assumeIsolated {
+                guard response == .OK, let url = panel.url, let self else { return }
+                let info = Self.pageSetup()
+                info.jobDisposition = .save
+                info.dictionary()[NSPrintInfo.AttributeKey.jobSavingURL] = url
+                let operation = self.printOperation(with: info)
+                operation.showsPrintPanel = false
+                operation.runModal(for: window, delegate: nil, didRun: nil, contextInfo: nil)
+            }
+        }
+    }
+
+    private var documentTitle: String {
+        fileURL?.deletingPathExtension().lastPathComponent ?? "Markdown"
+    }
+
+    private static func pageSetup() -> NSPrintInfo {
         let info = NSPrintInfo.shared.copy() as! NSPrintInfo
         info.horizontalPagination = .fit
         info.verticalPagination = .automatic
@@ -221,11 +250,14 @@ final class ViewerModel: NSObject, ObservableObject {
         info.bottomMargin = 36
         info.leftMargin = 36
         info.rightMargin = 36
+        return info
+    }
 
+    private func printOperation(with info: NSPrintInfo) -> NSPrintOperation {
         let operation = webView.printOperation(with: info)
-        operation.jobTitle = fileURL?.deletingPathExtension().lastPathComponent ?? "Markdown"
+        operation.jobTitle = documentTitle
         operation.view?.frame = webView.bounds
-        operation.runModal(for: window, delegate: nil, didRun: nil, contextInfo: nil)
+        return operation
     }
 
     // MARK: Links

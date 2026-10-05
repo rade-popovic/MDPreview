@@ -9,7 +9,7 @@ A read-only Markdown viewer for macOS that behaves like Preview: double-click a 
 ## Features
 
 - **GitHub-style rendering** — tables, task lists, syntax-highlighted code, front matter, light and dark mode
-- **Native document app** — one window per file, recent files, window restore, print and Save as PDF
+- **Native document app** — one window per file, recent files, window restore, reopens where you left off, print and Export as PDF
 - **Outline sidebar** — every heading, follows you as you scroll, click to jump
 - **Find bar** — highlights every match; step through with ⌘G / ⇧⌘G
 - **Live reload** — re-renders when the file is saved, keeping your place

@@ -25,6 +25,11 @@ struct ViewerCommands: Commands {
             }
         }
 
+        CommandGroup(replacing: .importExport) {
+            Button("Export as PDF…") { viewer?.exportPDF() }
+                .disabled(viewer == nil)
+        }
+
         CommandGroup(replacing: .printItem) {
             Button("Print…") { viewer?.printDocument() }
                 .keyboardShortcut("p")
