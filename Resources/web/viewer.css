@@ -1,0 +1,30 @@
+html, body {
+  margin: 0;
+  background: #ffffff;
+}
+
+@media screen and (prefers-color-scheme: dark) {
+  html, body { background: #0d1117; }
+}
+
+.markdown-body {
+  box-sizing: border-box;
+  min-width: 200px;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 32px 45px 64px;
+}
+
+@media (max-width: 767px) {
+  .markdown-body { padding: 16px; }
+}
+
+/* Let the GitHub stylesheet own code block background and padding. */
+.markdown-body pre code.hljs {
+  padding: 0;
+  background: transparent;
+}
+
+@media print {
+  .markdown-body { max-width: none; padding: 0; }
+}
