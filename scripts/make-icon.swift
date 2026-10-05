@@ -32,19 +32,19 @@ func render(size: CGFloat) -> NSBitmapImageRep {
     NSBezierPath(roundedRect: tile, xRadius: 185 * s, yRadius: 185 * s).fill()
     NSGraphicsContext.current?.restoreGraphicsState()
 
-    // Lowercase "md" in slate, centred on its visible glyph bounds, with a paper underline.
+    // Lowercase "md" in slate, centred on its visible glyph bounds, with a matching underline.
     let font = CTFontCreateWithFontDescriptor(plexSemiBold, 430 * s, nil)
     let text = NSAttributedString(string: "md", attributes: [.font: font, .foregroundColor: slate])
     let line = CTLineCreateWithAttributedString(text)
     let context = NSGraphicsContext.current!.cgContext
     let bounds = CTLineGetImageBounds(line, context)
-    let barHeight = 44 * s, gap = 70 * s
+    let barHeight = 16 * s, gap = 64 * s
     let groupHeight = bounds.height + gap + barHeight
     let glyphBottom = tile.midY - groupHeight / 2 + barHeight + gap
     context.textPosition = CGPoint(x: tile.midX - bounds.midX, y: glyphBottom - bounds.minY)
     CTLineDraw(line, context)
 
-    paper.setFill()
+    slate.setFill()
     let bar = NSRect(x: tile.midX - bounds.width / 2, y: glyphBottom - gap - barHeight,
                      width: bounds.width, height: barHeight)
     NSBezierPath(roundedRect: bar, xRadius: barHeight / 2, yRadius: barHeight / 2).fill()
