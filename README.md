@@ -3,7 +3,7 @@
 A read-only Markdown viewer for macOS that behaves like Preview: double-click a `.md` file, get a window.
 
 GitHub-style rendering (tables, task lists, code highlighting), light/dark mode, relative images,
-live reload when the file changes, search, zoom and print. Everything works offline.
+live reload when the file changes, a heading outline sidebar, search, zoom and print. Everything works offline.
 
 Includes a Quick Look extension, so pressing Space on a `.md` file in Finder shows the same rendering.
 

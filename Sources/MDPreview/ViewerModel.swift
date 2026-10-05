@@ -2,11 +2,21 @@ import AppKit
 import UniformTypeIdentifiers
 import WebKit
 
+struct OutlineItem: Identifiable, Equatable {
+    let id: Int
+    let level: Int
+    let title: String
+}
+
 /// One per document window: owns the web view and everything the menus and toolbar act on.
 @MainActor
 final class ViewerModel: NSObject, ObservableObject {
     let webView: MarkdownWebView
     weak var searchField: NSSearchField?
+
+    /// Headings in document order, and the one currently at the top of the view.
+    @Published private(set) var outline: [OutlineItem] = []
+    @Published private(set) var currentHeading: Int?
 
     private var fileURL: URL?
     private var markdown: String
@@ -37,6 +47,7 @@ final class ViewerModel: NSObject, ObservableObject {
         webView.allowsMagnification = true
         webView.setValue(false, forKey: "drawsBackground")
         webView.onZoomIn = { [weak self] in self?.zoomIn() }
+        webView.configuration.userContentController.add(ScriptMessageProxy(self), name: "viewer")
 
         loadPage()
         startWatching()
@@ -87,6 +98,25 @@ final class ViewerModel: NSObject, ObservableObject {
         } else {
             loadPage()
         }
+    }
+
+    fileprivate func handleScriptMessage(_ body: Any) {
+        guard let message = body as? [String: Any] else { return }
+        switch message["type"] as? String {
+        case "outline":
+            let items = message["items"] as? [[String: Any]] ?? []
+            outline = items.enumerated().map { index, item in
+                OutlineItem(id: index, level: item["level"] as? Int ?? 1, title: item["title"] as? String ?? "")
+            }
+        case "current":
+            currentHeading = message["index"] as? Int
+        default:
+            break
+        }
+    }
+
+    func scrollToHeading(_ index: Int) {
+        webView.evaluateJavaScript("scrollToHeading(\(index))")
     }
 
     func fileMoved(to newURL: URL?) {
@@ -219,6 +249,19 @@ extension ViewerModel: WKNavigationDelegate, WKUIDelegate {
 
     func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
         loadPage()
+    }
+}
+
+/// Weak hop between WebKit and the model: the content controller retains its handlers.
+private final class ScriptMessageProxy: NSObject, WKScriptMessageHandler {
+    weak var viewer: ViewerModel?
+
+    init(_ viewer: ViewerModel) {
+        self.viewer = viewer
+    }
+
+    func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage) {
+        MainActor.assumeIsolated { viewer?.handleScriptMessage(message.body) }
     }
 }
 

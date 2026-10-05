@@ -8,7 +8,10 @@ struct MDPreviewApp: App {
             DocumentView(markdown: file.document.text, fileURL: file.fileURL)
         }
         .defaultSize(width: 900, height: 1000)
-        .commands { ViewerCommands() }
+        .commands {
+            SidebarCommands()
+            ViewerCommands()
+        }
     }
 }
 

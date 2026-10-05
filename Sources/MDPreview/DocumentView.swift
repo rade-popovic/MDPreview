@@ -1,8 +1,13 @@
 import SwiftUI
 
 struct DocumentView: View {
+    private static let showOutlineKey = "showOutline"
+
     let fileURL: URL?
     @StateObject private var viewer: ViewerModel
+    /// Each window toggles on its own; new windows open the way the last one was left.
+    @State private var columnVisibility: NavigationSplitViewVisibility =
+        (UserDefaults.standard.object(forKey: DocumentView.showOutlineKey) as? Bool ?? true) ? .all : .detailOnly
 
     init(markdown: String, fileURL: URL?) {
         self.fileURL = fileURL
@@ -10,6 +15,18 @@ struct DocumentView: View {
     }
 
     var body: some View {
+        NavigationSplitView(columnVisibility: $columnVisibility) {
+            OutlineSidebar(viewer: viewer)
+                .navigationSplitViewColumnWidth(min: 160, ideal: 220, max: 360)
+        } detail: {
+            content
+        }
+        .onChange(of: columnVisibility) { _, visibility in
+            UserDefaults.standard.set(visibility != .detailOnly, forKey: Self.showOutlineKey)
+        }
+    }
+
+    private var content: some View {
         WebViewHost(webView: viewer.webView)
             .frame(minWidth: 420, minHeight: 300)
             .toolbar {
@@ -36,6 +53,40 @@ struct DocumentView: View {
             .onChange(of: fileURL) { _, newURL in
                 viewer.fileMoved(to: newURL)
             }
+    }
+}
+
+/// Document headings, indented by level. Click to jump; follows the reader while scrolling.
+private struct OutlineSidebar: View {
+    @ObservedObject var viewer: ViewerModel
+
+    var body: some View {
+        let topLevel = viewer.outline.map(\.level).min() ?? 1
+        let selection = Binding<Int?>(
+            get: { viewer.currentHeading },
+            set: { index in if let index { viewer.scrollToHeading(index) } }
+        )
+
+        ScrollViewReader { proxy in
+            List(selection: selection) {
+                ForEach(viewer.outline) { item in
+                    Text(item.title)
+                        .lineLimit(1)
+                        .fontWeight(item.level == topLevel ? .semibold : .regular)
+                        .padding(.leading, CGFloat(item.level - topLevel) * 12)
+                        .help(item.title)
+                }
+            }
+            .listStyle(.sidebar)
+            .onChange(of: viewer.currentHeading) { _, index in
+                if let index { proxy.scrollTo(index) }
+            }
+        }
+        .overlay {
+            if viewer.outline.isEmpty {
+                ContentUnavailableView("No Headings", systemImage: "list.bullet.indent")
+            }
+        }
     }
 }
 
